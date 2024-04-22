@@ -1,0 +1,176 @@
+﻿@model List<MCS_project.Models.Employee>
+
+<div class="dropdown-container">
+    <div>
+        <h3>Hourly Payroll</h3>
+        @Html.DropDownList("lstHourly", ViewBag.HourlyEmployees as SelectList, new { onchange = "loadEmployeeData(this.value);" })
+    </div>
+    <div>
+        <h3>Monthly Payroll</h3>
+        @Html.DropDownList("lstMonthly", ViewBag.MonthlyEmployees as SelectList, new { onchange = "loadEmployeeData(this.value);" })
+    </div>
+    <div>
+        <h3>Freelancer</h3>
+        @Html.DropDownList("lstFreelancer", ViewBag.FreelancerEmployees as SelectList, new { onchange = "loadEmployeeData(this.value);" })
+    </div>
+</div>
+
+<div style="display: flex; justify-content: left; align-items:center; height: 30vh;">
+    <div id="employeeData">
+        <table>
+            <tr>
+                <td><label for="name">Name:</label></td>
+                <td><input type="text" id="name" size="70" /></td>
+            </tr>
+            <tr>
+                <td><label for="address">Address:</label></td>
+                <td><input type="text" id="address" size="70" /></td>
+            </tr>
+            <tr>
+                <td><label for="birthDate">Birth Date:</label></td>
+                <td><input type="text" id="birthDate" size="70" /></td>
+            </tr>
+            <tr>
+                <td><label for="graduation">Graduation:</label></td>
+                <td><input type="text" id="graduation" size="70" /></td>
+            </tr>
+            <tr>
+                <td><label for="employmentType">Employment Type:</label></td>
+                <td><input type="text" id="employmentType" size="70" /></td>
+            </tr>
+            <tr>
+                <td><label for="assurance">Assurance:</label></td>
+                <td><input type="text" id="assurance" size="70" /></td>
+            </tr>
+            <tr>
+                <td><label for="salary">Salary:</label></td>
+                <td><input type="text" id="salary" size="70" /></td>
+            </tr>
+        </table>
+        
+    </div>
+</div>
+
+
+<button id="addButton" onclick="newEmployee()">Add</button>
+<button id="editButton" onclick="editEmployee()" disabled>Edit</button>
+<button id="deleteButton" onclick="deleteEmployeeData()" disabled>Delete</button>
+<button id="clearButton" onclick="clearForm()" disabled>Clear</button>
+
+
+<script>
+    function loadEmployeeData(employeeName) {
+        $.ajax({
+            url: '/Employee/GetEmployeeData',
+            type: 'GET', data: { name: employeeName },
+            success: function (data) {
+                $('#employeeData').html(data);
+                $('#name').prop('readonly', true);
+                $('#addButton').prop('disabled', true);
+                $('#editButton').prop('disabled', false);
+                $('#deleteButton').prop('disabled', false);
+                $('#clearButton').prop('disabled', false);
+                $('#calculateOvertime').prop('disabled', !$('#salary').val());
+            },error: function () {
+                alert('An error occurred while loading the employees.');
+            }
+        });
+    }
+    function clearForm() {
+        $('#employeeData').find('input[type=text]').val('');
+        $('#name').prop('readonly', false);
+        $('#addButton').prop('disabled', false);  
+        $('#editButton').prop('disabled', true);
+        $('#deleteButton').prop('disabled', true);
+        $('#clearButton').prop('disabled', true);
+        $('#calculateOvertime').prop('disabled', true);
+    }
+    function newEmployee() {
+        if (!$('#name').val() || !$('#address').val() || !$('#birthDate').val() || !$('#graduation').val() || !$('#employmentType').val()) { alert('Please fill in all required fields.'); return; }
+        $.ajax({
+            url: '/Employee/AddEmployee',
+            type: 'POST', data: {
+                Name: $('#name').val(),
+                Address: $('#address').val(),
+                BirthDate: $('#birthDate').val(),
+                Graduation: $('#graduation').val(),
+                EmploymentType: $('#employmentType').val(),
+                Assurance: $('#assurance').val(),
+                Salary: $('#salary').val()
+            },
+            success: function () {
+                clearForm();
+                alert('Employee added successfully!');
+            },
+            error: function () {
+                alert('An error occurred while adding the employee.');
+            }
+        });
+    }
+
+    function editEmployee() {
+
+        $.ajax({
+            url: '/Employee/EditEmployee',
+            type: 'POST',data: {
+                Name: $('#name').val(),
+                Address: $('#address').val(),
+                BirthDate: $('#birthDate').val(),
+                Graduation: $('#graduation').val(),
+                EmploymentType: $('#employmentType').val(),
+                Assurance: $('#assurance').val(),
+                Salary: $('#salary').val()
+            },
+            success: function () {
+                alert('Employee edited successfully!');
+                location.reload();
+            },
+            error: function () {
+                alert('An error occurred while editing the employee.');
+            }
+        });
+    }
+
+    function deleteEmployeeData() {
+        var employeeName = $('#name').val();
+        $.ajax({
+            url: '/Employee/DeleteEmployee',
+            type: 'POST', data: { name: employeeName },
+            success: function () {
+                alert('Employee deleted successfully!');
+                location.reload();
+            },
+            error: function () {
+                alert('An error occurred while deleting the employee.');
+            }
+        });
+    }
+
+    function calculateOvertime() {
+        var employmentType = $('#employmentType').val();
+        var salary = parseFloat($('#salary').val());
+        var overtimeRate;
+
+        switch (employmentType) {
+            case 'Monthly payroll': overtimeRate = salary / 160; break;
+            case 'Hourly Payroll': overtimeRate = salary * 3 / 16; break;
+            case 'Free lancer': overtimeRate = salary * 1.5; break;
+            default:alert('Invalid employment type.');return;
+        }
+        $('#overtimeRate').text('Overtime Rate: ' + overtimeRate);
+    }
+
+    function checkSalary() {
+        var salary = $('#salary').val();
+        $('#calculateOvertime').prop('disabled', !salary);
+    }
+</script>
+
+
+
+
+
+
+
+
+

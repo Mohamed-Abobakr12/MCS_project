@@ -1,0 +1,39 @@
+﻿@model MCS_project.Models.Employee
+
+<div id="employeeData">
+    <table>
+        <tr>
+            <td><label for="name">Name:</label></td>
+            <td><input type="text" id="name" value="@Model.Name" size="70"  /></td>
+        </tr>
+        <tr>
+            <td><label for="address">Address:</label></td>
+            <td><input type="text" id="address" value="@Model.Address" size="70" /></td>
+        </tr>
+        <tr>
+            <td><label for="birthDate">Birth Date:</label></td>
+            <td><input type="text" id="birthDate" value="@Model.BirthDate.ToString("dd/MM/yyyy")" size="70" /></td>
+        </tr>
+        <tr>
+            <td><label for="graduation">Graduation:</label></td>
+            <td><input type="text" id="graduation" value="@Model.Graduation" size="70" /></td>
+        </tr>
+        <tr>
+            <td><label for="employmentType">Employment Type:</label></td>
+            <td><input type="text" id="employmentType" value="@Model.EmploymentType" size="70" /></td>
+        </tr>
+        <tr>
+            <td><label for="assurance">Assurance:</label></td>
+            <td><input type="text" id="assurance" value="@Model.Assurance" size="70" /></td>
+        </tr>
+        <tr>
+            <td><label for="salary">Salary:</label></td>
+            <td>
+                <input type="text" id="salary" value="@Model.Salary" size="70" oninput="checkSalary()" />
+                <button id="calculateOvertime" onclick="calculateOvertime()" disabled>Calculate Overtime Rate</button>
+                <label id="overtimeRate"></label>
+            </td>
+        
+        </tr>
+    </table>
+</div>
